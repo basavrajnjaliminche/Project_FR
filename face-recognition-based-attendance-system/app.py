@@ -1,12 +1,43 @@
 import cv2
 import os
-from flask import Flask,request,render_template
+from flask import Flask,request,render_template,send_file
 from datetime import date
 from datetime import datetime
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
 import joblib
+import webbrowser
+import time
+import signal
+import gridfs
+from pymongo import MongoClient
+
+######creating mongo connection 
+
+# Connect to the server with the hostName and portNumber.
+connection = MongoClient("localhost", 27017)
+
+# Connect to the Database where the images will be stored.
+database = connection['Faces']
+
+#Create a object of GridFs for the above database.
+fs= gridfs.GridFS(database)
+
+#define an image object with the location.
+file = "D:\CAD-2\Project_Git\Project_FR\face-recognition-based-attendance-system\static\faces"
+
+""" #Open the image in read-only format.
+with open(file, 'rb') as f:
+    contents = f.read()
+    
+#Now store/put the image via GridFs object.
+fs.put(contents, filename="file")
+     """
+
+#### a global flag variabel
+should_stop = False
+
 
 #### Defining Flask App
 app = Flask(__name__)
@@ -101,12 +132,14 @@ def home():
 #### This function will run when we click on Take Attendance Button
 @app.route('/start',methods=['GET'])
 def start():
+    global should_stop
     if 'face_recognition_model.pkl' not in os.listdir('static'):
         return render_template('home.html',totalreg=totalreg(),datetoday2=datetoday2,mess='There is no trained model in the static folder. Please add a new face to continue.') 
 
     cap = cv2.VideoCapture(0)
-    ret = True
-    while ret:
+    
+  
+    while not should_stop:
         ret,frame = cap.read()
         if extract_faces(frame)!=():
             (x,y,w,h) = extract_faces(frame)[0]
@@ -116,13 +149,20 @@ def start():
             add_attendance(identified_person)
             cv2.putText(frame,f'{identified_person}',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
         cv2.imshow('Attendance',frame)
-        if cv2.waitKey(1)==27:
+        if should_stop or cv2.waitKey(1)==ord('q'):
+            cv2.destroyAllWindows()
             break
+    cv2.destroyAllWindows()    
     cap.release()
-    cv2.destroyAllWindows()
     names,rolls,times,l = extract_attendance()    
-    return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
-
+    return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
+#### This function will run when we stop attendanceqqqq
+@app.route('/stop', methods=['GET'])
+def stop():
+    global should_stop
+    should_stop = True
+    names,rolls,times,l = extract_attendance()
+    return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
 
 #### This function will run when we add a new user
 @app.route('/add',methods=['GET','POST'])
@@ -157,9 +197,23 @@ def add():
     names,rolls,times,l = extract_attendance()    
     return render_template('home.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
 
+### to download the attendance report
+@app.route('/download')
+def download_file():
+    path = "D:\\CAD Conestoga 2023\\reposFaceRecognition2\\face-recognition-based-attendance-system\\Attendance\\Attendance-"+datetoday+".csv"
+    return send_file(path, as_attachment=True)
 
 #### Our main function which runs the Flask App
 if __name__ == '__main__':
     app.run(debug=True)
-    
-# This function stops the take attendance menu
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-    <link rel="stylesheet" href="style.css">
+    
 
 <style type='text/css'>
     * {
@@ -11,7 +11,7 @@
 
 
     body {
-        background-color: black;
+        background-color: #161616;
         background-size: cover;
         font-family: sans-serif;
         margin-top: 40px;
@@ -77,15 +77,16 @@
             <a style="text-decoration: none;max-width: 300px;" href="/start">
                 <button
                     style="font-size: 24px;font-weight: bold;border-radius: 10px;width:490px;padding: 10px;margin-top: 30px;margin-bottom: 30px;"
-                    type='submit' class='btn btn-primary'>Take Attendance <i
-                        class="material-icons">beenhere</i>
-                </button>
+                    type='submit' class='btn btn-primary'>Start Attendance <i
+                        class="material-icons">beenhere</i></button>
+            </a>
+            <a style="text-decoration: none;max-width: 150px;" href="/stop">
                 <button
                     style="font-size: 24px;font-weight: bold;border-radius: 10px;width:490px;padding: 10px;margin-top: 30px;margin-bottom: 30px;"
-                    type='submit' class='btn btn-primary'>Stop Attendance Working <i
-                        class="material-icons"> beenhere</i>
-                </button>
+                    type='submit' class='btn btn-primary'>Stop Attendance <i
+                        class="material-icons">beenhere</i></button>
             </a>
+           
             <table style="background-color: white;">
                 <tr>
                     <td><b>S No</b></td>
@@ -105,7 +106,12 @@
                 {% endfor %}
                 {% endif %}
             </table>
-
+            <a style="text-decoration: none;max-width: 300px;" href="/download">
+                <button
+                    style="font-size: 24px;font-weight: bold;border-radius: 10px;width:490px;padding: 10px;margin-top: 30px;margin-bottom: 30px;"
+                    type='submit' class='btn btn-primary'> Download Report <i
+                        class="material-icons">beenhere</i></button>
+            </a>
         </div>
 
         <div class="col"
@@ -132,6 +138,9 @@
         </div>
 
     </div>
+    <br>
+    <a href="D:\CAD Conestoga 2023\reposFaceRecognition2\face-recognition-based-attendance-system\Attendance\Attendance-02_18_23.csv" download>Download Report</a>
+
 
     <script type="text/javascript">
         var clockElement = document.getElementById('clock');
