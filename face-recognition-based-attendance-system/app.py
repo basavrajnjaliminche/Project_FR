@@ -11,29 +11,21 @@ import webbrowser
 import time
 import signal
 import gridfs
+import pymongo
 from pymongo import MongoClient
+
 
 ######creating mongo connection 
 
 # Connect to the server with the hostName and portNumber.
-connection = MongoClient("localhost", 27017)
+""" connection = MongoClient("localhost", 27017) """
+client = pymongo.MongoClient("mongodb://localhost:27017")
 
 # Connect to the Database where the images will be stored.
-database = connection['Faces']
+db = client['Faces']
 
-#Create a object of GridFs for the above database.
-fs= gridfs.GridFS(database)
-
-#define an image object with the location.
-file = "D:\CAD-2\Project_Git\Project_FR\face-recognition-based-attendance-system\static\faces"
-
-""" #Open the image in read-only format.
-with open(file, 'rb') as f:
-    contents = f.read()
-    
-#Now store/put the image via GridFs object.
-fs.put(contents, filename="file")
-     """
+#Create a new collection
+col = db['FR']
 
 #### a global flag variabel
 should_stop = False
@@ -133,6 +125,9 @@ def home():
 @app.route('/start',methods=['GET'])
 def start():
     global should_stop
+     
+    should_stop = False
+       
     if 'face_recognition_model.pkl' not in os.listdir('static'):
         return render_template('home.html',totalreg=totalreg(),datetoday2=datetoday2,mess='There is no trained model in the static folder. Please add a new face to continue.') 
 
@@ -206,6 +201,7 @@ def download_file():
 #### Our main function which runs the Flask App
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
